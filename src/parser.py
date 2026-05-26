@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Iterator
+from typing import Callable, Iterator, Optional
 
 from .models import CrashBlock, LogEntry, ParseResult, Verbosity
 from .utils import is_callstack_line, is_crash_trigger, match_log_line, parse_timestamp
+
+_PROGRESS_INTERVAL = 500  # call progress_fn every N lines
 
 # How many normal entries to keep as context around a crash
 _CONTEXT_WINDOW = 10
@@ -49,7 +51,19 @@ def _iter_lines(path: Path) -> Iterator[tuple[int, str]]:
 
 
 class LogParser:
-    def parse(self, path: str | Path) -> ParseResult:
+    def parse(
+        self,
+        path: str | Path,
+        *,
+        progress_fn: Optional[Callable[[int], None]] = None,
+    ) -> ParseResult:
+        """Parse a UE log file.
+
+        Args:
+            path: Path to the .log file.
+            progress_fn: Optional callback called with the current line number
+                         every ``_PROGRESS_INTERVAL`` lines and once at the end.
+        """
         path = Path(path)
         result = ParseResult()
 
@@ -63,6 +77,9 @@ class LogParser:
 
         for line_number, raw in _iter_lines(path):
             result.total_lines = line_number
+
+            if progress_fn and line_number % _PROGRESS_INTERVAL == 0:
+                progress_fn(line_number)
 
             m = match_log_line(raw)
 
@@ -130,6 +147,9 @@ class LogParser:
         # Flush any open crash block at EOF
         if in_crash and current_crash is not None:
             result.crash_blocks.append(current_crash)
+
+        if progress_fn:
+            progress_fn(result.total_lines)
 
         result.finalize()
         return result
