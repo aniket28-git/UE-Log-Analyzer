@@ -1,0 +1,85 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "UE Log: Analyze (Console)",
+            "type": "shell",
+            "command": "python -m src.main analyze \"${file}\"",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "UE Log: Analyze → HTML",
+            "type": "shell",
+            "command": "python -m src.main analyze \"${file}\" --output html -o \"${fileDirname}/${fileBasenameNoExtension}_report.html\"",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "UE Log: Analyze → JSON",
+            "type": "shell",
+            "command": "python -m src.main analyze \"${file}\" --output json -o \"${fileDirname}/${fileBasenameNoExtension}_report.json\"",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "UE Log: Watch Mode",
+            "type": "shell",
+            "command": "python -m src.main analyze \"${file}\" --watch",
+            "group": "build",
+            "isBackground": true,
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "UE Log: Diff Two Logs",
+            "type": "shell",
+            "command": "python -m src.main diff \"${input:beforeLog}\" \"${input:afterLog}\"",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "UE Log: Run Tests",
+            "type": "shell",
+            "command": "python -m pytest tests/ -v",
+            "group": "test",
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "beforeLog",
+            "type": "promptString",
+            "description": "Path to the BEFORE log file",
+            "default": "before.log"
+        },
+        {
+            "id": "afterLog",
+            "type": "promptString",
+            "description": "Path to the AFTER log file",
+            "default": "after.log"
+        }
+    ]
+}

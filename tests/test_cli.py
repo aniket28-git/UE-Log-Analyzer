@@ -5,7 +5,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from click.testing import CliRunner
-from src.main import analyze
+from src.main import cli, analyze
 
 SAMPLES = Path(__file__).parent / "sample_logs"
 COMPREHENSIVE = str(SAMPLES / "comprehensive.log")

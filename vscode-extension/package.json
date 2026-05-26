@@ -1,0 +1,70 @@
+{
+    "name": "ue-log-analyzer",
+    "displayName": "UE Log Analyzer",
+    "description": "Analyze Unreal Engine log files directly in VS Code",
+    "version": "0.1.0",
+    "publisher": "ue-log-analyzer",
+    "engines": { "vscode": "^1.85.0" },
+    "categories": ["Other"],
+    "activationEvents": [
+        "onCommand:ue-log-analyzer.analyzeFile",
+        "onCommand:ue-log-analyzer.analyzeFileHtml",
+        "onCommand:ue-log-analyzer.watchFile",
+        "onCommand:ue-log-analyzer.diffLogs"
+    ],
+    "main": "./extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "ue-log-analyzer.analyzeFile",
+                "title": "UE Log Analyzer: Analyze File (Console)"
+            },
+            {
+                "command": "ue-log-analyzer.analyzeFileHtml",
+                "title": "UE Log Analyzer: Analyze File → HTML Report"
+            },
+            {
+                "command": "ue-log-analyzer.watchFile",
+                "title": "UE Log Analyzer: Watch File (live re-analysis)"
+            },
+            {
+                "command": "ue-log-analyzer.diffLogs",
+                "title": "UE Log Analyzer: Diff Two Log Files"
+            }
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "when": "resourceExtname == .log",
+                    "command": "ue-log-analyzer.analyzeFile",
+                    "group": "navigation@1"
+                },
+                {
+                    "when": "resourceExtname == .log",
+                    "command": "ue-log-analyzer.analyzeFileHtml",
+                    "group": "navigation@2"
+                },
+                {
+                    "when": "resourceExtname == .log",
+                    "command": "ue-log-analyzer.watchFile",
+                    "group": "navigation@3"
+                }
+            ]
+        },
+        "configuration": {
+            "title": "UE Log Analyzer",
+            "properties": {
+                "ueLogAnalyzer.pythonPath": {
+                    "type": "string",
+                    "default": "python",
+                    "description": "Path to the Python interpreter to use."
+                },
+                "ueLogAnalyzer.projectRoot": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Root directory of the ue-log-analyzer project (where src/ lives). Defaults to the workspace root."
+                }
+            }
+        }
+    }
+}
