@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UE Log Analyzer — Workflow</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --accent: #58a6ff;
+      --accent2: #3fb950;
+      --accent3: #d29922;
+      --accent4: #f85149;
+      --accent5: #bc8cff;
+      --accent6: #39d3f0;
+      --text: #c9d1d9;
+      --muted: #8b949e;
+      --arrow: #484f58;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      padding: 40px 24px 60px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 48px;
+    }
+
+    /* ── Layout ─────────────────────────────────────── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    /* ── Arrow connectors ────────────────────────────── */
+    .arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      padding: 4px 0;
+    }
+    .arrow-line {
+      width: 2px;
+      height: 28px;
+      background: var(--arrow);
+    }
+    .arrow-head {
+      width: 0;
+      height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 10px solid var(--arrow);
+    }
+    .arrow-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── Section labels ──────────────────────────────── */
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    /* ── Card ────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      width: 100%;
+      position: relative;
+    }
+    .card-title {
+      font-weight: 700;
+      font-size: 0.97rem;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .icon { font-size: 1.1rem; }
+    .card-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.67rem;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 20px;
+      vertical-align: middle;
+    }
+
+    /* ── Color accents per layer ─────────────────────── */
+    .c-input   { border-color: var(--accent);  }
+    .c-input .card-title  { color: var(--accent); }
+    .c-config  { border-color: var(--accent5); }
+    .c-config .card-title { color: var(--accent5); }
+    .c-parse   { border-color: var(--accent3); }
+    .c-parse .card-title  { color: var(--accent3); }
+    .c-filter  { border-color: var(--accent6); }
+    .c-filter .card-title { color: var(--accent6); }
+    .c-analyze { border-color: var(--accent2); }
+    .c-analyze .card-title{ color: var(--accent2); }
+    .c-report  { border-color: var(--accent4); }
+    .c-report .card-title { color: var(--accent4); }
+    .c-output  { border-color: var(--accent);  }
+    .c-output .card-title { color: var(--accent); }
+
+    /* ── Grid rows (horizontal spread) ──────────────── */
+    .row {
+      display: grid;
+      width: 100%;
+      gap: 14px;
+    }
+    .row-3 { grid-template-columns: repeat(3, 1fr); }
+    .row-4 { grid-template-columns: repeat(4, 1fr); }
+    .row-2 { grid-template-columns: repeat(2, 1fr); }
+
+    /* ── Analyzer grid (special) ─────────────────────── */
+    .analyzer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      width: 100%;
+    }
+    .analyzer-grid .card {
+      padding: 12px 14px;
+    }
+    .analyzer-grid .card-title {
+      font-size: 0.85rem;
+    }
+    .analyzer-grid .card-sub {
+      font-size: 0.74rem;
+    }
+
+    /* ── Output row ──────────────────────────────────── */
+    .output-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+    }
+
+    /* ── Watch / Diff special row ────────────────────── */
+    .special-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      width: 100%;
+    }
+
+    /* ── Legend ──────────────────────────────────────── */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 44px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── File tags ───────────────────────────────────── */
+    .file-tag {
+      display: inline-block;
+      font-family: 'Consolas', monospace;
+      font-size: 0.7rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: var(--muted);
+      margin-top: 5px;
+      margin-right: 4px;
+    }
+
+    @media (max-width: 700px) {
+      .row-3, .row-4, .analyzer-grid, .output-grid, .special-grid, .row-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>UE Log Analyzer — Tool Workflow</h1>
+<p class="subtitle">End-to-end data flow from raw Unreal Engine <code>.log</code> file to structured report</p>
+
+<div class="flow">
+
+  <!-- ══ INPUTS ══════════════════════════════════════════ -->
+  <div class="section-label">Input</div>
+  <div class="row row-2">
+    <div class="card c-input">
+      <div class="card-title"><span class="icon">📄</span> UE Log File (single)</div>
+      <div class="card-sub">
+        A raw Unreal Engine <code>.log</code> file passed directly to the CLI.<br>
+        <span class="file-tag">MyProject.log</span>
+      </div>
+    </div>
+    <div class="card c-input">
+      <div class="card-title"><span class="icon">📄📄</span> Two Log Files (diff mode)</div>
+      <div class="card-sub">
+        A <em>before</em> and <em>after</em> log file for regression comparison via the <code>diff</code> subcommand.<br>
+        <span class="file-tag">before.log</span> <span class="file-tag">after.log</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ CLI ENTRY POINT ════════════════════════════════ -->
+  <div class="section-label">CLI Entry Point</div>
+  <div class="card c-config" style="max-width:640px">
+    <div class="card-title"><span class="icon">⌨️</span> CLI — <code>python -m src.main</code></div>
+    <div class="card-sub">
+      Click group with two subcommands:
+      <strong>analyze</strong> (single log) and <strong>diff</strong> (two logs).<br>
+      Flags: <code>--output console|html|json</code>, <code>--severity</code>, <code>--category</code>,
+      <code>--since</code>, <code>--until</code>, <code>--hitch-threshold</code>,
+      <code>--shader-threshold</code>, <code>--watch</code>, <code>-o / --out-file</code>.<br>
+      <span class="file-tag">src/main.py</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ CONFIG ═════════════════════════════════════════ -->
+  <div class="section-label">Configuration (optional)</div>
+  <div class="card c-config" style="max-width:640px">
+    <div class="card-title"><span class="icon">⚙️</span> Config Loader — <code>load_config()</code></div>
+    <div class="card-sub">
+      Walks ancestor directories looking for <code>.ue-log-analyzer.toml</code>.
+      Merges discovered config with CLI flags (CLI wins).
+      Provides <code>[thresholds]</code>, <code>[defaults]</code>, and <code>[categories.aliases]</code>.<br>
+      <span class="file-tag">src/config.py</span>
+      <span class="file-tag">.ue-log-analyzer.toml</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ PARSER ═════════════════════════════════════════ -->
+  <div class="section-label">Parsing</div>
+  <div class="card c-parse" style="max-width:640px">
+    <div class="card-title"><span class="icon">🔍</span> State-Machine Parser</div>
+    <div class="card-sub">
+      Reads the log line-by-line using UE's timestamp+category regex.
+      Handles: standard log lines, header-less continuations, multi-line crash blocks.
+      Emits a <code>ParseResult</code> containing <code>LogEntry[]</code> and <code>CrashBlock[]</code>.
+      Streams a Rich progress bar to the terminal during parsing.<br>
+      <span class="file-tag">src/parser.py</span>
+      <span class="file-tag">src/models.py</span>
+      <span class="file-tag">src/utils.py</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ FILTERS ════════════════════════════════════════ -->
+  <div class="section-label">Filtering</div>
+  <div class="card c-filter" style="max-width:640px">
+    <div class="card-title"><span class="icon">🔧</span> Filter Engine — <code>apply_filters()</code></div>
+    <div class="card-sub">
+      Applies <code>FilterOptions</code> derived from CLI flags to <code>LogEntry[]</code>.
+      Filters by: severity level, category allowlist, time window (<code>--since</code> / <code>--until</code>).
+      Crash blocks are always preserved regardless of filters.<br>
+      <span class="file-tag">src/filters.py</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ ANALYZERS ══════════════════════════════════════ -->
+  <div class="section-label">Analysis — <code>run_all()</code> orchestrates all analyzers → <code>AnalysisReport</code></div>
+  <div class="analyzer-grid">
+
+    <div class="card c-analyze">
+      <div class="card-title"><span class="icon">💥</span> Crash</div>
+      <div class="card-sub">
+        Enriches crash blocks with exception type, source file &amp; line number.
+      </div>
+      <span class="file-tag">crash.py</span>
+    </div>
+
+    <div class="card c-analyze">
+      <div class="card-title"><span class="icon">⚠️</span> Errors &amp; Warnings</div>
+      <div class="card-sub">
+        Deduplicates by message template; counts occurrences per unique issue.
+      </div>
+      <span class="file-tag">errors.py</span>
+    </div>
+
+    <div class="card c-analyze">
+      <div class="card-title"><span class="icon">📦</span> Assets</div>
+      <div class="card-sub">
+        Detects missing references, load failures, and cook errors.
+      </div>
+      <span class="file-tag">assets.py</span>
+    </div>
+
+    <div class="card c-analyze">
+      <div class="card-title"><span class="icon">🎨</span> Shaders</div>
+      <div class="card-sub">
+        Compile errors and slow compilations above configurable threshold.
+      </div>
+      <span class="file-tag">shaders.py</span>
+    </div>
+
+    <div class="card c-analyze">
+      <div class="card-title"><span class="icon">⏱️</span> Performance</div>
+      <div class="card-sub">
+        Hitches, GC purges, OOM events — all with configurable thresholds.
+      </div>
+      <span class="file-tag">performance.py</span>
+    </div>
+
+    <div class="card c-analyze">
+      <div class="card-title"><span class="icon">🌐</span> Network</div>
+      <div class="card-sub">
+        Packet loss, timeouts, disconnects, and socket errors.
+      </div>
+      <span class="file-tag">network.py</span>
+    </div>
+
+    <div class="card c-analyze">
+      <div class="card-title"><span class="icon">📅</span> Timeline</div>
+      <div class="card-sub">
+        Builds a chronological event timeline sorted by log line number.
+      </div>
+      <span class="file-tag">timeline.py</span>
+    </div>
+
+    <div class="card c-analyze" style="border-color: var(--accent2); opacity: 0.7">
+      <div class="card-title" style="color: var(--accent2)"><span class="icon">📊</span> runner.py</div>
+      <div class="card-sub">
+        Orchestrates all analyzers and assembles the final <code>AnalysisReport</code>.
+      </div>
+      <span class="file-tag">runner.py</span>
+    </div>
+
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ REPORT GENERATION ══════════════════════════════ -->
+  <div class="section-label">Report Generation</div>
+  <div class="output-grid">
+
+    <div class="card c-report">
+      <div class="card-title"><span class="icon">🖥️</span> Console Report</div>
+      <div class="card-sub">
+        Colored Rich terminal output. Summary panel, collapsible sections per analyzer category.
+      </div>
+      <span class="file-tag">report/console.py</span>
+    </div>
+
+    <div class="card c-report">
+      <div class="card-title"><span class="icon">🌐</span> HTML Report</div>
+      <div class="card-sub">
+        Self-contained dark-theme HTML via Jinja2. Collapsible sections, no external dependencies.
+      </div>
+      <span class="file-tag">report/html.py</span>
+    </div>
+
+    <div class="card c-report">
+      <div class="card-title"><span class="icon">📋</span> JSON Export</div>
+      <div class="card-sub">
+        Full structured JSON of the <code>AnalysisReport</code> for downstream tooling or CI.
+      </div>
+      <span class="file-tag">report/json_export.py</span>
+    </div>
+
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ FINAL OUTPUT ═══════════════════════════════════ -->
+  <div class="section-label">Output</div>
+  <div class="output-grid">
+    <div class="card c-output">
+      <div class="card-title"><span class="icon">💬</span> Terminal</div>
+      <div class="card-sub">Printed directly to stdout with Rich color and formatting.</div>
+    </div>
+    <div class="card c-output">
+      <div class="card-title"><span class="icon">📁</span> File</div>
+      <div class="card-sub">Written to a file path via <code>-o / --out-file</code>. HTML or JSON.</div>
+    </div>
+    <div class="card c-output">
+      <div class="card-title"><span class="icon">🔌</span> VS Code</div>
+      <div class="card-sub">VS Code tasks + extension scaffold surface reports inside the editor.</div>
+    </div>
+  </div>
+
+  <!-- ══ SEPARATOR ══════════════════════════════════════ -->
+  <div style="margin: 44px 0 10px; width:100%; border-top: 1px solid var(--border);"></div>
+  <div class="section-label" style="margin-top: 20px;">Advanced Features</div>
+
+  <!-- ══ WATCH + DIFF ═══════════════════════════════════ -->
+  <div class="special-grid">
+
+    <div class="card" style="border-color: var(--accent5)">
+      <div class="card-title" style="color: var(--accent5)"><span class="icon">👁️</span> Watch Mode — <code>--watch</code></div>
+      <div class="card-sub">
+        Polls the log file for mtime changes via <code>poll_until_changed()</code>.
+        Re-runs the full analysis pipeline automatically on every change.
+        Ideal for monitoring a live session.<br>
+        <span class="file-tag">src/watcher.py</span>
+      </div>
+    </div>
+
+    <div class="card" style="border-color: var(--accent4)">
+      <div class="card-title" style="color: var(--accent4)"><span class="icon">🔀</span> Diff Mode — <code>diff before.log after.log</code></div>
+      <div class="card-sub">
+        Runs the full pipeline on both logs, then <code>compute_diff()</code> computes per-section added/removed/delta.
+        Exits with code <strong>1</strong> on regressions (useful in CI).
+        Outputs a <code>DiffReport</code> to console or JSON.<br>
+        <span class="file-tag">src/diff.py</span>
+        <span class="file-tag">report/diff_console.py</span>
+        <span class="file-tag">report/diff_json.py</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ══ LEGEND ════════════════════════════════════════════ -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> Input / Output</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--accent5)"></div> Config / CLI / Watch</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--accent3)"></div> Parser</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--accent6)"></div> Filters</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--accent2)"></div> Analyzers</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--accent4)"></div> Report / Diff</div>
+</div>
+
+</body>
+</html>
