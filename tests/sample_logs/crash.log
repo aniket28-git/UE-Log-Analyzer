@@ -1,0 +1,16 @@
+[2024.03.15-12.34.50:000][1838]LogEngine: Display: Running game tick
+[2024.03.15-12.34.50:100][1839]LogEngine: Display: Processing actor components
+[2024.03.15-12.34.50:200][1840]LogEngine: Display: Updating physics
+[2024.03.15-12.34.50:300][1841]LogEngine: Display: Pre-tick complete
+[2024.03.15-12.34.56:789][1842]LogEngine: Fatal: Assertion failed: IsValid(Component) [File:D:/Build/++UE5/Sync/Engine/Source/Runtime/Engine/Private/ActorComponent.cpp] [Line: 412]
+Fatal error!
+
+Unhandled Exception: EXCEPTION_ACCESS_VIOLATION reading address 0x0000000000000040
+
+0x00007ff6a1b2c3d4 UE4Editor-Engine.dll!UActorComponent::RegisterComponent() [D:/Build/++UE5/Sync/Engine/Source/Runtime/Engine/Private/ActorComponent.cpp:412]
+0x00007ff6a1b2a000 UE4Editor-Engine.dll!AActor::RegisterAllComponents() [D:/Build/++UE5/Sync/Engine/Source/Runtime/Engine/Private/Actor.cpp:521]
+0x00007ff6a1c00000 UE4Editor-Engine.dll!UWorld::InitializeActorsForPlay() [D:/Build/++UE5/Sync/Engine/Source/Runtime/Engine/Private/World.cpp:3312]
+0x00007ff700001234 UE4Editor.exe!FEngineLoop::Tick() [D:/Build/++UE5/Sync/Engine/Source/Runtime/Launch/Private/LaunchEngineLoop.cpp:4521]
+
+[2024.03.15-12.34.57:000][1843]LogExit: Display: Attempting clean shutdown after crash
+[2024.03.15-12.34.57:100][1843]LogExit: Display: Destroying subsystems

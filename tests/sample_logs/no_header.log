@@ -1,0 +1,5 @@
+[2024.03.15-10.00.00:000][  0]LogInit: Display: Starting up
+This line has no UE header, it is a continuation of the previous message.
+Another raw line with no header.
+[2024.03.15-10.00.01:000][  1]LogEngine: Warning: Something odd happened
+[2024.03.15-10.00.02:000][  2]LogEngine: Display: Normal line after continuation
